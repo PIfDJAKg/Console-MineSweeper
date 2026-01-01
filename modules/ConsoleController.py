@@ -25,7 +25,7 @@ class Controller:
 			self.frameBuffer.append([])
 			# Создание значений по x
 			for _ in range(self.width):
-				self.frameBuffer[y].append("")
+				self.frameBuffer[y].append(".")
 		
 	# Отрисовка кадра в консоли
 	def fillFrame(self) -> None:
@@ -34,27 +34,68 @@ class Controller:
 		for y in range(self.height):
 			output_frame += "\n"
 			for x in range(self.width):
-				output_frame += self.frameBuffer[y][x]
+				output_frame += " " + self.frameBuffer[y][x]
 		print(output_frame)
 	
 	# Добавление горизонтальной линии в буфер
 	def drawHLine(self, pos:Vector2, lenght:int, symbol:str):
-		if len(symbol) == 1:  # Проверка является ли строка символом
-			for i in range(lenght):
-				self.drawPixel(pos, symbol)
-				pos.x += 1
-			return self.frameBuffer
-		else:
+		# Проверяем символ, что бы он не являлся строкой
+		if len(symbol) != 1:
 			print("Получена строка а ожидался один символ!")
+		elif lenght == 0:
+			print("Длинна не может равняться нулю!")
+		else:
+			# Вычисляем шаг
+			step = 1 if lenght >= 0 else -1
+			# Получаем модуль длинны
+			abs_lenght = abs(lenght)
+			for _ in range(abs_lenght):
+				self.drawPixel(pos.copy(), symbol)  # Рисуем пиксель
+				pos.x += step  # Добавляем шаг к позиции
+
+
+	# Добавление горизонтальной линии в буфер
+	def drawVLine(self, pos:Vector2, lenght:int, symbol:str) -> None:
+		# Проверяем символ, что бы он не являлся строкой
+		if len(symbol) != 1:
+			print("Получена строка а ожидался один символ!")
+		elif lenght == 0:
+			print("Длинна не может равняться нулю!")
+		else:
+			# Вычисляем шаг
+			step = 1 if lenght >= 0 else -1
+			# Получаем модуль длинны
+			abs_lenght = abs(lenght)
+			for _ in range(abs_lenght):
+				self.drawPixel(pos.copy(), symbol)
+				pos.y += step
 			
 	# Добавление полого квадрата в буфер
-	def drawRect(pos:Vector2, size:Vector2, symbol:str):
-		pass
+	def drawRect(self, pos:Vector2, size:Vector2, symbol:str) -> None:
+		if len(symbol) == 1:
+			self.drawHLine(pos.copy(), size.x, symbol)  # Отрисовка верхней границы,
+			self.drawVLine(pos.copy(), size.y, symbol)  # Отрисовка левой границы,
+			pos.x += size.x - 1
+			pos.y += size.y - 1
+			self.drawHLine(pos.copy(), -size.x, symbol)  # Отрисовка нижней границы,
+			self.drawVLine(pos.copy(), -size.y, symbol)  # Отрисовка правой границы,
+		else:
+			print("Получена строка а ожидался один символ!")
 	
+	# Добавление заполненного квадрата в буфер
+	def drawFRect(self, pos:Vector2, size:Vector2, symbol:str) -> None:
+		if len(symbol) != 1:
+			print("Получена строка а ожидался один символ!")
+		else:
+			for _ in range(size.y):
+				self.drawHLine(pos.copy(), size.x, symbol)  # Отрисовка линии
+				pos.y += 1  # Смещение курсора на пиксель вниз
+
 	# Добавление пикселя в буфер
 	def drawPixel(self, position:Vector2, symbol:str) -> None:
 		if len(symbol) == 1:  # Проверка является ли строка символом
 			try:
+				# Присваиваем пикселю в буфере значение символа 
 				self.frameBuffer[position.y][position.x] = symbol
 			except:
 				None
@@ -69,4 +110,4 @@ class Controller:
 		if os_name.lower() == "Windows".lower(): #Если это Windows
 			os.system("cls")
 		else: # Иначе это Linux/MacOS
-			os.system("clear") 
+			os.system("clear")
