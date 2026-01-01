@@ -25,7 +25,7 @@ class Controller:
 			self.frameBuffer.append([])
 			# Создание значений по x
 			for _ in range(self.width):
-				self.frameBuffer[y].append(".")
+				self.frameBuffer[y].append("")
 		
 	# Отрисовка кадра в консоли
 	def fillFrame(self) -> None:
@@ -37,6 +37,18 @@ class Controller:
 				output_frame += " " + self.frameBuffer[y][x]
 		print(output_frame)
 	
+	# Добавление горизонтального текста в буфер
+	def drawHText(self, pos:Vector2, text:str):
+		for symbol in text:
+			self.drawPixel(pos.copy(), symbol)
+			pos.x += 1
+	
+	# Добавление вертикального текста в буфер
+	def drawVText(self, pos:Vector2, text:str):
+		for symbol in text:
+			self.drawPixel(pos.copy(), symbol)
+			pos.y += 1
+
 	# Добавление горизонтальной линии в буфер
 	def drawHLine(self, pos:Vector2, lenght:int, symbol:str):
 		# Проверяем символ, что бы он не являлся строкой
