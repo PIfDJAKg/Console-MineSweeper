@@ -3,7 +3,6 @@ import os
 from platform import system
 from modules.Ptypes import Vector2
 
-
 # Класс контроллера консоли
 class Controller:
 	def __init__(self) -> None:
@@ -26,7 +25,7 @@ class Controller:
 			# Создание значений по x
 			for _ in range(self.width):
 				self.frameBuffer[y].append("")
-		
+
 	# Отрисовка кадра в консоли
 	def fillFrame(self) -> None:
 		self.clear()  # Очищаем консоль
@@ -36,7 +35,7 @@ class Controller:
 			for x in range(self.width):
 				output_frame += " " + self.frameBuffer[y][x]
 		print(output_frame)
-	
+
 	# Добавление горизонтального текста в буфер
 	def drawHText(self, pos:Vector2, text:str):
 		for symbol in text:
@@ -87,8 +86,7 @@ class Controller:
 		if len(symbol) == 1:
 			self.drawHLine(pos.copy(), size.x, symbol)  # Отрисовка верхней границы,
 			self.drawVLine(pos.copy(), size.y, symbol)  # Отрисовка левой границы,
-			pos.x += size.x - 1
-			pos.y += size.y - 1
+			pos = pos.add(size.subtract(Vector2(1, 1)))  # Переносим курсор в конец квадрата
 			self.drawHLine(pos.copy(), -size.x, symbol)  # Отрисовка нижней границы,
 			self.drawVLine(pos.copy(), -size.y, symbol)  # Отрисовка правой границы,
 		else:
