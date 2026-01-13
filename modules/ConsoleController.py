@@ -12,11 +12,22 @@ class Controller:
 	
 	# Установка размера поля
 	def setResolution(self, resolution:Vector2) -> None:
+		"""
+		setResolution() -> Выставляет разрешение консольного экрана
+		
+		:param resolution: Разрешение консольного экрана Ширина/Высота
+		:type resolution: Vector2
+		"""
+
 		self.width = resolution.x  # Устанавливаем ширину
 		self.height = resolution.y  # Устанавливаем высоту
 		
-	# Обновление размера поля
+	# Обновление размера буфера
 	def updateBuffer(self) -> None:
+		"""
+		updateBuffer() -> Обновляеть разрешение буфера
+		"""
+
 		# Очищаем буфер
 		self.frameBuffer.clear()
 		# Создание списков по y
@@ -28,6 +39,10 @@ class Controller:
 
 	# Отрисовка кадра в консоли
 	def fillFrame(self) -> None:
+		"""
+		Отрисовывает кадр из буфера в консоли
+		"""
+
 		self.clear()  # Очищаем консоль
 		output_frame = ""
 		for y in range(self.height):
@@ -38,18 +53,45 @@ class Controller:
 
 	# Добавление горизонтального текста в буфер
 	def drawHText(self, pos:Vector2, text:str):
+		"""
+		Добавляет горизонтальный текст в буфер
+		
+		:param pos: Стартавая позиция в буфере по x, y
+		:type pos: Vector2
+		:param text: Текст
+		:type text: str
+		"""
 		for symbol in text:
 			self.drawPixel(pos.copy(), symbol)
 			pos.x += 1
 	
 	# Добавление вертикального текста в буфер
 	def drawVText(self, pos:Vector2, text:str):
+		"""
+		Добавляет вертикальный текст в буфер
+		
+		:param pos: Стартавая позиция в буфере по x, y
+		:type pos: Vector2
+		:param text: Текст
+		:type text: str
+		"""
 		for symbol in text:
 			self.drawPixel(pos.copy(), symbol)
 			pos.y += 1
 
 	# Добавление горизонтальной линии в буфер
 	def drawHLine(self, pos:Vector2, lenght:int, symbol:str):
+		"""
+		Добавляет горизонтальную линию в буфер
+		
+		:param pos: Стартовая позиция в буфере по x, y
+		:type pos: Vector2
+		:param lenght: Длинна линии в пикселях
+		:type lenght: int
+		:param symbol: Символ отрисовки
+		:type symbol: str
+		"""
+
 		# Проверяем символ, что бы он не являлся строкой
 		if len(symbol) != 1:
 			print("Получена строка а ожидался один символ!")
@@ -67,6 +109,17 @@ class Controller:
 
 	# Добавление горизонтальной линии в буфер
 	def drawVLine(self, pos:Vector2, lenght:int, symbol:str) -> None:
+		"""
+		Добавляет вертикальную линию в буфер
+		
+		:param pos: Стартовая позиция в буфере по x, y
+		:type pos: Vector2
+		:param lenght: Длинна линии в пикселях
+		:type lenght: int
+		:param symbol: Символ отрисовки
+		:type symbol: str
+		"""
+
 		# Проверяем символ, что бы он не являлся строкой
 		if len(symbol) != 1:
 			print("Получена строка а ожидался один символ!")
@@ -83,6 +136,17 @@ class Controller:
 			
 	# Добавление полого квадрата в буфер
 	def drawRect(self, pos:Vector2, size:Vector2, symbol:str) -> None:
+		"""
+		Добавляет полый квадрат в буфер
+		
+		:param pos: Начальная позиция по x, y
+		:type pos: Vector2
+		:param size: Размер width, height
+		:type size: Vector2
+		:param symbol: Символ отрисовки
+		:type symbol: str
+		"""
+
 		if len(symbol) == 1:
 			self.drawHLine(pos.copy(), size.x, symbol)  # Отрисовка верхней границы,
 			self.drawVLine(pos.copy(), size.y, symbol)  # Отрисовка левой границы,
@@ -94,6 +158,17 @@ class Controller:
 	
 	# Добавление заполненного квадрата в буфер
 	def drawFRect(self, pos:Vector2, size:Vector2, symbol:str) -> None:
+		"""
+		Добавляет заполненный квадрат в буфер
+		
+		:param pos: Начальная позиция по x, y
+		:type pos: Vector2
+		:param size: Размер width, height
+		:type size: Vector2
+		:param symbol: Символ отрисовки
+		:type symbol: str
+		"""
+
 		if len(symbol) != 1:
 			print("Получена строка а ожидался один символ!")
 		else:
@@ -103,6 +178,15 @@ class Controller:
 
 	# Добавление пикселя в буфер
 	def drawPixel(self, position:Vector2, symbol:str) -> None:
+		"""
+		Добавляет пиксель в буфер
+		
+		:param position: Позиция пикселя по x, y
+		:type position: Vector2
+		:param symbol: Символ отрисовки
+		:type symbol: str
+		"""
+
 		if len(symbol) == 1:  # Проверка является ли строка символом
 			try:
 				# Присваиваем пикселю в буфере значение символа 
@@ -115,7 +199,11 @@ class Controller:
 	
 	# Очистка терминала
 	def clear(self) -> None:
-		# Получение имени
+		"""
+		Очищает консоль
+		"""
+
+		# Получение имени системы
 		os_name = system()
 		if os_name.lower() == "Windows".lower(): #Если это Windows
 			os.system("cls")
