@@ -17,7 +17,7 @@ class Game:
         self.display_size: Vector2 = Vector2(14, 14)
         # Размер игрового поля, отнимаем 4 потому-что столько занимает рамка
         self.game_size: Vector2 = self.display_size.subtract(Vector2(4, 4))
-        self.mines_count = 12
+        self.mines_count = 14
 
         self.errors_codes = {
             0 : "Invalid",
@@ -33,6 +33,7 @@ class Game:
         self.mines_list: list = []  # Положения мин
         self.numbers_list: list = []  # Чисела на поле
         self.flags_list: list = []  # Флажки на поле
+        self.cubes_list: list = []  # Закрытые и открытые клетки на поле
 
     # Создание внутренностей списков
     def create_lists(self) -> None:
@@ -40,10 +41,12 @@ class Game:
             self.mines_list.append([])
             self.numbers_list.append([])
             self.flags_list.append([])
+            self.cubes_list.append([])
             for x in range(self.game_size.x):
-                self.mines_list[y].append("")
+                self.mines_list[y].append(None)
                 self.numbers_list[y].append(None)
                 self.flags_list[y].append(None)
+                self.cubes_list[y].append(True)
 
     # Случайный вектор
     def random_vector2(self, min:Vector2, max:Vector2) -> Vector2:
@@ -52,7 +55,7 @@ class Game:
         return Vector2(x, y)
 
     # Генерация мин
-    def generate_mines(self, count:int) -> None:
+    def generate_mines(self, count:int, except_cell:Vector2=None) -> None:
         for i in range(count):
             # Уменьшаем на 1 потому-что в списке рассчет начинается не с 1 а с 0
             max_vector = self.game_size.subtract(Vector2(1, 1))
@@ -134,10 +137,16 @@ class Game:
         for y in range(self.game_size.y):
             for x in range(self.game_size.x):
                 position_on_grid = Vector2(x, y).add(grid_offset)
-                if self.mines_list[y][x]:
+                if self.flags_list[y][x] == True:
+                    self.controller.drawPixel(position_on_grid, "P")
+                elif self.cubes_list[y][x] == True:
+                    self.controller.drawPixel(position_on_grid, "■")
+                elif self.mines_list[y][x]:
                     self.controller.drawPixel(position_on_grid, "@")
                 elif self.numbers_list[y][x] != None:
                     self.controller.drawPixel(position_on_grid, str(self.numbers_list[y][x]))
+                else:
+                    self.controller.drawPixel(position_on_grid, ".")
 
     # Получение ввода клетки
     def get_cell(self, invalid:bool = False, error_code:int = 0) -> Vector2:
@@ -185,7 +194,7 @@ class Game:
         elif cell == "":
             return self.get_cell(invalid=True, error_code=3)
 
-        return Vector2(number, letter_in_alphabet)
+        return Vector2(int(number), letter_in_alphabet)
     
     def get_step(self, invalid:bool = False, error_code:int = 0) -> int:
         """
@@ -223,16 +232,22 @@ class Game:
             return int(step)
 
     # Открыть клетку
-    def open_cell(self, pos: Vector2):
-        pass
-    
+    def open_cell(self, pos: Vector2) -> bool:
+        if self.cubes_list[pos.y][pos.x]:
+            self.cubes_list[pos.y][pos.x] = None
+            return True
+        else:
+            return False
+        
     # Поставить флаг на клетку
-    def use_flag(self, pos: Vector2) -> None:
+    def use_flag(self, pos: Vector2) -> bool:
         if self.flags_list[pos.y][pos.x]:
             self.flags_list[pos.y][pos.x] = None
         else:
             self.flags_list[pos.y][pos.x] = True
 
+        return True
+    
     # Получаем ход игрока
     def get_move(self) -> None:
         cell = self.get_cell()
@@ -241,9 +256,16 @@ class Game:
 
         match step:
             case 1:
-                pass
+                self.open_cell(cell)
             case 2:
                 self.use_flag(cell)
+
+    # Функция которая выполняется всегда
+    def process(self) -> None:
+        while True:
+            self.get_move()
+            self.grid_render()
+            self.controller.fillFrame()
 
     def main(self):
         self.draw_frame()  # отрисовываем рамку
@@ -252,7 +274,7 @@ class Game:
         self.generate_numbers()  # Генерируем числа
         self.grid_render()  # Рендерим поле
         self.controller.fillFrame() # Отрисовываем кадр
-        self.get_move()
+        self.process()
         
 
 
