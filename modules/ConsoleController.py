@@ -3,6 +3,19 @@ import os
 from platform import system
 from modules.Ptypes import Vector2
 
+# Очистка терминала
+def clear() -> None:
+	"""
+	Очищает консоль
+	"""
+	
+	# Получение имени системы
+	os_name = system()
+	if os_name.lower() == "Windows".lower(): #Если это Windows
+		os.system("cls")
+	else: # Иначе это Linux/MacOS
+		os.system("clear")
+
 # Класс контроллера консоли
 class Controller:
 	def __init__(self) -> None:
@@ -43,7 +56,7 @@ class Controller:
 		Отрисовывает кадр из буфера в консоли
 		"""
 
-		self.clear()  # Очищаем консоль
+		clear()  # Очищаем консоль
 		output_frame = ""
 		for y in range(self.height):
 			output_frame += "\n"
@@ -192,20 +205,6 @@ class Controller:
 				# Присваиваем пикселю в буфере значение символа 
 				self.frameBuffer[position.y][position.x] = symbol
 			except:
-				None
+				pass
 		else:
 			print("Получена строка а ожидался один символ!")
-			
-	
-	# Очистка терминала
-	def clear(self) -> None:
-		"""
-		Очищает консоль
-		"""
-
-		# Получение имени системы
-		os_name = system()
-		if os_name.lower() == "Windows".lower(): #Если это Windows
-			os.system("cls")
-		else: # Иначе это Linux/MacOS
-			os.system("clear")

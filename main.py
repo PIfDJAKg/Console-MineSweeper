@@ -9,6 +9,12 @@ from modules.Ptypes import Vector2
 from string import ascii_uppercase
 from random import randint
 
+# Случайный вектор
+def random_vector2(min:Vector2, max:Vector2) -> Vector2:
+    x = randint(min.x, max.x)
+    y = randint(min.y, max.y)
+    return Vector2(x, y)
+
 class Game:
     def __init__(self):
         # Создание контроллера
@@ -31,7 +37,7 @@ class Game:
         self.controller.updateBuffer()
 
         self.mines_list: list = []  # Положения мин
-        self.numbers_list: list = []  # Чисела на поле
+        self.numbers_list: list = []  # Числа на поле
         self.flags_list: list = []  # Флажки на поле
         self.cubes_list: list = []  # Закрытые и открытые клетки на поле
 
@@ -48,20 +54,14 @@ class Game:
                 self.flags_list[y].append(None)
                 self.cubes_list[y].append(True)
 
-    # Случайный вектор
-    def random_vector2(self, min:Vector2, max:Vector2) -> Vector2:
-        x = randint(min.x, max.x)
-        y = randint(min.y, max.y)
-        return Vector2(x, y)
-
     # Генерация мин
     def generate_mines(self, count:int, except_cell:Vector2=None) -> None:
         for i in range(count):
             # Уменьшаем на 1 потому-что в списке рассчет начинается не с 1 а с 0
             max_vector = self.game_size.subtract(Vector2(1, 1))
-            mine_position = self.random_vector2(Vector2(0, 0), max_vector)
+            mine_position = random_vector2(Vector2(0, 0), max_vector)
             while self.mines_list[mine_position.x][mine_position.y] == True:
-                mine_position = self.random_vector2(Vector2(0, 0), max_vector)
+                mine_position = random_vector2(Vector2(0, 0), max_vector)
             
             self.mines_list[mine_position.x][mine_position.y] = True
 
@@ -137,9 +137,9 @@ class Game:
         for y in range(self.game_size.y):
             for x in range(self.game_size.x):
                 position_on_grid = Vector2(x, y).add(grid_offset)
-                if self.flags_list[y][x] == True:
+                if self.flags_list[y][x]:
                     self.controller.drawPixel(position_on_grid, "P")
-                elif self.cubes_list[y][x] == True:
+                elif self.cubes_list[y][x]:
                     self.controller.drawPixel(position_on_grid, "■")
                 elif self.mines_list[y][x]:
                     self.controller.drawPixel(position_on_grid, "@")
@@ -166,12 +166,11 @@ class Game:
         # Вывод ошибки
         if invalid:
             self.controller.fillFrame()
-            print("")
-            print(f"{self.errors_codes[error_code]}! Enter again, exemple: A1")
+            print(f"\n{self.errors_codes[error_code]}! Enter again, exemple: A1")
         else:
             print("")
         
-        cell = input("Ender cell >> ").lower()
+        cell = input("Enter cell >> ").lower()
 
 
         
@@ -195,7 +194,7 @@ class Game:
             return self.get_cell(invalid=True, error_code=3)
 
         return Vector2(int(number), letter_in_alphabet)
-    
+
     def get_step(self, invalid:bool = False, error_code:int = 0) -> int:
         """
         Docstring for get_step
@@ -212,8 +211,7 @@ class Game:
 
         if invalid:
             self.controller.fillFrame()
-            print("")
-            print(f"{self.errors_codes[error_code]}! Write again, examble: 2")
+            print(f"\n{self.errors_codes[error_code]}! Write again, examble: 2")
         else:
             print("")
 
@@ -232,12 +230,24 @@ class Game:
             return int(step)
 
     # Открыть клетку
-    def open_cell(self, pos: Vector2) -> bool:
+    def open_cell(self, pos: Vector2):
         if self.cubes_list[pos.y][pos.x]:
             self.cubes_list[pos.y][pos.x] = None
-            return True
-        else:
-            return False
+            if (self.numbers_list[pos.y][pos.x] == None 
+                and self.mines_list[pos.y][pos.x] == None):
+                
+                for dy in (-1, 0, 1):
+                    for dx in (-1, 0, 1):
+                        nx = pos.x + dx
+                        ny = pos.y + dy
+                        
+                        # Пропускаем клетку если это базавая клетка
+                        if nx == pos.x and ny == pos.y:
+                            continue
+                        
+                        if 0 <= nx < self.game_size.x and 0 <= ny < self.game_size.y:
+                            self.open_cell(Vector2(nx, ny))
+
         
     # Поставить флаг на клетку
     def use_flag(self, pos: Vector2) -> bool:
